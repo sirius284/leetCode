@@ -1,1 +1,135 @@
 
+// mySolution.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+#include "treeNode.h"
+#include<vector>
+#include <iostream>
+#include<algorithm>
+using namespace std;
+
+
+/*
+0.给定一个有序数组，生成一颗BST---leetcode108
+BST树的特点：根结点大于左子树所有节点、小于右子树所有节点。
+*/
+treeNode* genBST(vector<int>& nums){
+	if (nums.empty())return NULL; 
+	//把中间的值赋给根节点--中序遍历
+	treeNode* root = new treeNode(nums[nums.size() / 2]);
+	//每次取一半,类似二分
+	vector<int> vec_l = vector<int>(nums.begin(), nums.begin() + nums.size() / 2);
+	vector<int> vec_r = vector<int>(nums.begin() + nums.size() / 2 + 1, nums.end());
+	root->left = genBST(vec_l);
+	root->right = genBST(vec_r);
+	return root;
+}
+
+/*
+1.中序打印一颗二叉树---leetcode094
+*/
+void printTree(treeNode* tree){
+	if (tree == NULL){ return; }
+	printTree(tree->left);
+	printf("%i \n", tree->val);
+	printTree(tree->right);
+}
+
+/*
+2.检验一棵树是否是合法BST--leetcode098
+*/
+
+bool isValidBST(treeNode* root, treeNode* min, treeNode* max){
+	if (root == NULL)return true;
+	//根节点大于左子树、小于右子树
+	if (min != NULL && min->val >= root->val) return false;
+	if (max != NULL && max->val <= root->val) return false;
+	//相当于后序遍历
+	return isValidBST(root->left, min, root) && isValidBST(root->right, root, max);
+}
+bool isValidBST(treeNode* tree){
+	return isValidBST(tree, NULL, NULL);
+}
+
+
+/*
+3.给出两颗二叉树，判断它们是否相同 --LeetCode100
+给定两个二叉树，编写一个函数来检验它们是否相同。
+如果两个树在结构上相同，并且节点具有相同的值，则认为它们是相同的。
+*/
+
+bool isSameTree(treeNode* t1, treeNode* t2){
+	if (t1 == NULL && t2 == NULL) return true;
+	if (t1 == NULL || t2 == NULL) return false;
+	//不能改成两者相等就返回true，因为还要判断子节点的值
+	if (t1->val != t2->val)return false;
+	return isSameTree(t1->left, t2->left) && isSameTree(t1->right, t2->right);
+}
+
+/*
+4.给定一个二叉树，检查它是否是镜像对称的。--LeetCode101
+例如，二叉树 [1,2,2,3,4,4,3] 是对称的。
+    1
+   / \
+  2   2
+ / \ / \
+3  4 4  3
+ 
+ 但是下面这个 [1,2,2,null,3,null,3] 则不是镜像对称的:
+   1
+  / \
+ 2   2
+  \   \
+   3    3
+ 来源：力扣（LeetCode）
+ 链接：https://leetcode-cn.com/problems/symmetric-tree
+*/
+
+bool isSymmetricTree(treeNode* tree){
+	if (tree == NULL) return true;
+	if (tree->left == NULL || tree->right == NULL) return false;
+	//左边等于右边
+	if (tree->left->val != tree->right->val) return false;
+	return isSymmetricTree(tree->left) && isSymmetricTree(tree->right);
+}
+
+
+
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	//0.生成一颗BST 
+	int list[5] = { -10, -3, 0, 5, 9 };
+	vector < int > v = { { -10, -3, 0, 5, 9 } };
+	printf("%s \n", "0.生成一颗BST ");
+	treeNode* bst = genBST(v);
+	//1.中序打印一颗树
+	printf("%s \n", "1.中序打印一颗树");
+	printTree(bst);
+	//2.检验一棵树是否是合法BST
+	printf("%s \n", "2.检验一棵树是否是合法BST");
+	bool isBst = isValidBST(bst);
+	printf("%i \n", isBst);
+
+	//3.判断两棵树是否相同
+	printf("%s \n", "3.判断两棵树是否相同");
+	vector < int > v2 = { { -6, -3, 0, 1, 9 } };
+	treeNode* bst2 = genBST(v2);
+	bool isSameT = isSameTree(bst, bst2);
+	printf("%i \n", isSameT);
+
+	//4.是否是一颗镜像树
+	vector < int > v3 = { { 1, 2, 2, 3, 4, 4, 3 } };
+	sort(v3.begin(),v3.end());
+	treeNode* bst3 = genBST(v3);
+	printf("%s \n", "4.是否是一颗镜像树");
+	bool isStree = isSymmetricTree(bst3);
+	printf("%i \n", isStree);
+
+
+
+	return 0;
+}
+
+
